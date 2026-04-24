@@ -1,0 +1,8 @@
+{
+  "name": "autoflow-functions",
+  "version": "1.0.0",
+  "description": "AutoFlow Netlify Functions",
+  "dependencies": {
+    "stripe": "^14.0.0"
+  }
+}
