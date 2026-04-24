@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="fr" data-lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AutoFlow — Generate production-ready n8n workflows from plain language. Your AI automation architect.">
+<meta name="theme-color" content="#0a0a0f">
+<title>AutoFlow — AI Workflow Generator</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DESIGN SYSTEM — AutoFlow
+   Casual · Classy · Elegant
+   ============================================================ */
+:root {
+  --ink:        #0a0a0f;
+  --ink-2:      #16161f;
+  --ink-3:      #1e1e2a;
+  --surface:    #242433;
+  --glass:      rgba(255,255,255,0.04);
+  --glass-2:    rgba(255,255,255,0.07);
+  --border:     rgba(255,255,255,0.08);
+  --border-2:   rgba(255,255,255,0.14);
+  --gold:       #c9a96e;
+  --gold-light: #e8c98a;
+  --gold-dim:   rgba(201,169,110,0.15);
+  --text:       #e8e4dc;
+  --text-2:     #9b9789;
+  --text-3:     #5e5b54;
+  --green:      #4ade80;
+  --red:        #f87171;
+  --blue:       #60a5fa;
+
+  --f-display: 'Cormorant Garamond', Georgia, serif;
+  --f-body:    'DM Sans', system-ui, sans-serif;
+  --f-accent:  'Playfair Display', Georgia, serif;
+
+  --ease-out-expo: cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out:   cubic-bezier(0.4,0,0.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Grain texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Ambient glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(ellipse, rgba(201,169,110,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid transparent;
+  transition: all 0.4s var(--ease-in-out);
+  backdrop-filter: blur(0px);
+}
+
+nav.scrolled {
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom-color: var(--border);
+}
+
+.nav-logo {
+  font-family: var(--f-display);
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-logo span {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.lang-toggle {
+  display: flex;
+  gap: 2px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px;
+}
+
+.lang-btn {
+  font-family: var(--f-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.lang-btn.active {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.btn-nav {
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 9px 22px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  border-radius: 2px;
+  text-decoration: none;
+  transition: all 0.25s;
+  display: inline-block;
+}
+
+.btn-nav:hover {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 6rem;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp 0.8s var(--ease-out-expo) 0.2s forwards;
+}
+
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.5;
+}
+
+.hero-title {
+  font-family: var(--f-display);
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--ease-out-expo) 0.35s forwards;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero-title .line-2 {
+  display: block;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  color: var(--text-2);
+  font-weight: 300;
+  margin-top: 0.2em;
+}
+
+.hero-sub {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: var(--text-2);
+  max-width: 560px;
+  line-height: 1.8;
+  margin-bottom: 3rem;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--ease-out-expo) 0.5s forwards;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--ease-out-expo) 0.65s forwards;
+}
+
+.btn-primary {
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 14px 36px;
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  cursor: pointer;
+  border-radius: 2px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.15);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover::after { opacity: 1; }
+
+.btn-ghost {
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 14px 36px;
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--border-2);
+  cursor: pointer;
+  border-radius: 2px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.25s;
+}
+
+.btn-ghost:hover {
+  border-color: var(--text-2);
+  color: var(--text);
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  animation: fadeUp 1s var(--ease-out-expo) 1.2s forwards;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent, var(--gold));
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+.scroll-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section {
+  position: relative;
+  z-index: 1;
+}
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: var(--f-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 300;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+}
+
+.section-title em { font-style: italic; color: var(--gold); }
+
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+.how {
+  padding: 8rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: 4rem;
+}
+
+.how-step {
+  background: var(--ink);
+  padding: 3rem 2.5rem;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.how-step:hover { background: var(--ink-2); }
+
+.step-num {
+  font-family: var(--f-display);
+  font-size: 4rem;
+  font-weight: 300;
+  color: var(--gold-dim);
+  line-height: 1;
+  margin-bottom: 1.5rem;
+  transition: color 0.3s;
+}
+
+.how-step:hover .step-num { color: rgba(201,169,110,0.3); }
+
+.step-title {
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 400;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.step-desc {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+/* ============================================================
+   GENERATOR — Main App
+   ============================================================ */
+.generator {
+  padding: 8rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.gen-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-top: 4rem;
+}
+
+/* Input panel */
+.gen-input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.prompt-wrapper {
+  position: relative;
+}
+
+.prompt-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.prompt-textarea {
+  width: 100%;
+  min-height: 200px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.25rem;
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.prompt-textarea::placeholder { color: var(--text-3); }
+.prompt-textarea:focus { border-color: var(--gold); }
+
+.prompt-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.example-chip {
+  font-size: 11px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--f-body);
+}
+
+.example-chip:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.char-count {
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: right;
+}
+
+.btn-generate {
+  width: 100%;
+  padding: 16px;
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  border-radius: 4px;
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-generate:not(:disabled):hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Output panel */
+.gen-output-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.output-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.output-header {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.output-title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.output-body {
+  padding: 1.25rem;
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.75;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+}
+
+.output-body.has-content {
+  color: var(--text);
+  align-items: flex-start;
+}
+
+.output-placeholder {
+  color: var(--text-3);
+  font-style: italic;
+  font-family: var(--f-display);
+}
+
+.apps-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 1.25rem;
+}
+
+.app-tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(201,169,110,0.25);
+  border-radius: 2px;
+  color: var(--gold-light);
+  text-transform: capitalize;
+}
+
+.btn-download {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 4px;
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-download:hover {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.btn-download:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Loading state */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(10,10,15,0.3);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: none;
+}
+
+.btn-generate.loading .spinner { display: block; }
+.btn-generate.loading .btn-text { display: none; }
+
+/* Progress bar */
+.progress-bar {
+  height: 2px;
+  background: var(--border);
+  overflow: hidden;
+  display: none;
+}
+
+.progress-bar.active { display: block; }
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: sweep 1.4s ease-in-out infinite;
+}
+
+/* ============================================================
+   TUTORIAL SECTION
+   ============================================================ */
+.tutorial {
+  padding: 8rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.tutorial-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 4rem;
+  max-width: 680px;
+}
+
+.tut-step {
+  display: flex;
+  gap: 2rem;
+  position: relative;
+}
+
+.tut-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.tut-num {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-display);
+  font-size: 1.1rem;
+  color: var(--gold);
+  flex-shrink: 0;
+  background: var(--ink);
+  position: relative;
+  z-index: 1;
+}
+
+.tut-line {
+  width: 1px;
+  flex: 1;
+  background: linear-gradient(to bottom, var(--border-2), var(--border));
+  margin: 6px 0;
+}
+
+.tut-content {
+  padding-bottom: 3rem;
+  flex: 1;
+}
+
+.tut-title {
+  font-family: var(--f-display);
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  padding-top: 0.7rem;
+}
+
+.tut-desc {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+.tut-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.75rem;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.tut-link:hover { opacity: 0.7; }
+
+/* ============================================================
+   PRICING
+   ============================================================ */
+.pricing {
+  padding: 8rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 4rem;
+  max-width: 840px;
+}
+
+.pricing-card {
+  border: 1px solid var(--border);
+  padding: 2.5rem;
+  position: relative;
+  border-radius: 4px;
+  background: var(--glass);
+  transition: border-color 0.3s;
+}
+
+.pricing-card.featured {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(201,169,110,0.05), rgba(201,169,110,0.02));
+}
+
+.pricing-badge {
+  position: absolute;
+  top: -1px; right: 1.5rem;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.pricing-name {
+  font-family: var(--f-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.pricing-price {
+  font-family: var(--f-display);
+  font-size: 2.5rem;
+  font-weight: 300;
+  line-height: 1;
+  margin: 1rem 0 0.25rem;
+}
+
+.pricing-price span {
+  font-size: 1rem;
+  color: var(--text-2);
+}
+
+.pricing-trial {
+  font-size: 12px;
+  color: var(--gold);
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+.pricing-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.pricing-features li {
+  font-size: 14px;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feat-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* Orange Money form */
+.om-form {
+  display: none;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: var(--glass-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.om-form.visible { display: block; }
+
+.form-field {
+  margin-bottom: 1rem;
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 0.4rem;
+}
+
+.field-input {
+  width: 100%;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.field-input:focus { border-color: var(--gold); }
+.field-input::placeholder { color: var(--text-3); }
+
+.om-number {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--gold-dim);
+  border-radius: 3px;
+  line-height: 1.6;
+}
+
+.om-number strong { color: var(--gold); }
+
+/* ============================================================
+   HISTORY
+   ============================================================ */
+.history-section {
+  padding: 8rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.history-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+}
+
+.history-card:hover {
+  border-color: var(--border-2);
+  background: var(--glass-2);
+}
+
+.history-name {
+  font-family: var(--f-display);
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+
+.history-desc {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.history-meta {
+  font-size: 11px;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.history-dl {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--f-body);
+  transition: opacity 0.2s;
+}
+
+.history-dl:hover { opacity: 0.7; }
+
+.history-empty {
+  color: var(--text-3);
+  font-style: italic;
+  font-family: var(--f-display);
+  font-size: 1.1rem;
+  padding: 3rem 0;
+}
+
+/* ============================================================
+   AUTH MODAL
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(10px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--ink-2);
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  padding: 3rem;
+  width: 90%;
+  max-width: 420px;
+  transform: translateY(20px);
+  transition: transform 0.3s var(--ease-out-expo);
+}
+
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-title {
+  font-family: var(--f-display);
+  font-size: 1.8rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+}
+
+.modal-sub {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-bottom: 2rem;
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.modal-tab {
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+
+.modal-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.25rem; right: 1.25rem;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
+}
+
+.modal-close:hover { color: var(--text); }
+.modal { position: relative; }
+
+/* Notification */
+.notif {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--ink-2);
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  padding: 0.85rem 1.5rem;
+  font-size: 13px;
+  color: var(--text);
+  z-index: 999;
+  opacity: 0;
+  transition: all 0.3s var(--ease-out-expo);
+  white-space: nowrap;
+}
+
+.notif.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.notif.success { border-color: rgba(74,222,128,0.3); color: var(--green); }
+.notif.error   { border-color: rgba(248,113,113,0.3); color: var(--red); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-logo {
+  font-family: var(--f-display);
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--text-2);
+}
+
+.footer-logo span { color: var(--gold); font-style: italic; }
+
+/* The subtle byline — elegant, serif, gold, small */
+.byline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.8;
+}
+
+.byline strong {
+  font-weight: 400;
+  color: var(--gold);
+  font-style: normal;
+  letter-spacing: 0.06em;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--text-2); }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .gen-container { grid-template-columns: 1fr; }
+  .how-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; text-align: center; }
+}
+
+@media (max-width: 600px) {
+  .hero-title { font-size: 2.8rem; }
+  .section-inner { padding: 0 1.2rem; }
+  .modal { padding: 2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Auto<span>Flow</span></a>
+  <ul class="nav-links">
+    <li><a href="#how" data-i18n="nav.how">How it works</a></li>
+    <li><a href="#generator" data-i18n="nav.generate">Generate</a></li>
+    <li><a href="#tutorial" data-i18n="nav.tutorial">Tutorial</a></li>
+    <li><a href="#pricing" data-i18n="nav.pricing">Pricing</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="btn-nav" onclick="openAuth()" data-i18n="nav.login">Sign in</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow" data-i18n="hero.eyebrow">AI Automation Platform</div>
+  <h1 class="hero-title">
+    <em data-i18n="hero.title1">Describe it.</em>
+    <span class="line-2" data-i18n="hero.title2">We automate it.</span>
+  </h1>
+  <p class="hero-sub" data-i18n="hero.sub">
+    Generate production-ready n8n workflows from plain language. No code. No drag and drop. Just your idea — deployed in minutes.
+  </p>
+  <div class="hero-ctas">
+    <a href="#generator" class="btn-primary" data-i18n="hero.cta1">Generate a workflow</a>
+    <a href="#how" class="btn-ghost" data-i18n="hero.cta2">See how it works</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span class="scroll-label">Scroll</span>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-inner">
+    <p class="section-label" data-i18n="how.label">The process</p>
+    <h2 class="section-title" data-i18n="how.title">Three steps.<br><em>Infinite automations.</em></h2>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="step-num">01</div>
+        <h3 class="step-title" data-i18n="how.s1.title">Describe your need</h3>
+        <p class="step-desc" data-i18n="how.s1.desc">Type what you want to automate in plain language — French or English. No technical knowledge required.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">02</div>
+        <h3 class="step-title" data-i18n="how.s2.title">AI generates the workflow</h3>
+        <p class="step-desc" data-i18n="how.s2.desc">Our AI architect creates a complete, production-ready n8n workflow JSON in seconds. Every node, every connection.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">03</div>
+        <h3 class="step-title" data-i18n="how.s3.title">Import & run</h3>
+        <p class="step-desc" data-i18n="how.s3.desc">Download the file, import it into your n8n instance, connect your apps. Your agent runs 24/7 — autonomously.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GENERATOR -->
+<section class="generator" id="generator">
+  <div class="section-inner">
+    <p class="section-label" data-i18n="gen.label">The Generator</p>
+    <h2 class="section-title" data-i18n="gen.title">What do you want<br><em>to automate?</em></h2>
+
+    <div class="gen-container">
+      <!-- Input -->
+      <div class="gen-input-panel">
+        <div class="prompt-wrapper">
+          <label class="prompt-label" data-i18n="gen.prompt.label">Describe your automation</label>
+          <textarea class="prompt-textarea" id="promptInput"
+            placeholder="Ex: When I receive an email with 'invoice' in the subject, save the attachment to Google Drive and notify me on Slack..."
+            maxlength="2000"
+            oninput="updateCharCount(this)"></textarea>
+        </div>
+
+        <div class="char-count"><span id="charCount">0</span> / 2000</div>
+
+        <div>
+          <p class="prompt-label" data-i18n="gen.examples.label">Examples</p>
+          <div class="prompt-examples" id="exampleChips"></div>
+        </div>
+
+        <button class="btn-generate" id="generateBtn" onclick="generateWorkflow()">
+          <div class="spinner"></div>
+          <span class="btn-text" data-i18n="gen.btn">Generate my workflow</span>
+        </button>
+      </div>
+
+      <!-- Output -->
+      <div class="gen-output-panel">
+        <div class="output-card">
+          <div class="output-header">
+            <span class="output-title" data-i18n="gen.result.summary">What it does</span>
+            <div class="progress-bar" id="progressBar"><div class="progress-fill"></div></div>
+          </div>
+          <div class="output-body" id="summaryOutput">
+            <span class="output-placeholder" data-i18n="gen.result.placeholder">Your workflow summary will appear here...</span>
+          </div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-header">
+            <span class="output-title" data-i18n="gen.result.apps">Apps required</span>
+          </div>
+          <div class="apps-list" id="appsOutput">
+            <span class="output-placeholder" style="padding:0;font-family:var(--f-display);font-style:italic;font-size:14px;color:var(--text-3)" data-i18n="gen.result.apps_placeholder">Apps will be listed here</span>
+          </div>
+        </div>
+
+        <button class="btn-download" id="downloadBtn" disabled onclick="downloadWorkflow()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          <span data-i18n="gen.download">Download workflow.json</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TUTORIAL -->
+<section class="tutorial" id="tutorial">
+  <div class="section-inner">
+    <p class="section-label" data-i18n="tut.label">Import guide</p>
+    <h2 class="section-title" data-i18n="tut.title">From file to<br><em>running agent.</em></h2>
+    <div class="tutorial-steps" id="tutorialSteps"></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-inner">
+    <p class="section-label" data-i18n="price.label">Pricing</p>
+    <h2 class="section-title" data-i18n="price.title">Simple.<br><em>No surprises.</em></h2>
+
+    <div class="pricing-grid">
+      <!-- Stripe -->
+      <div class="pricing-card featured">
+        <div class="pricing-badge" data-i18n="price.badge">Most popular</div>
+        <p class="pricing-name">Pro</p>
+        <div class="pricing-price">1 000 <span>FCFA / <span data-i18n="price.month">mo</span></span></div>
+        <p class="pricing-trial" data-i18n="price.trial">7-day free trial · Card required</p>
+        <ul class="pricing-features" id="stripeFeatures"></ul>
+        <button class="btn-primary" style="width:100%;padding:13px" onclick="handleStripeCheckout()" data-i18n="price.stripe_btn">Pay by card (Stripe)</button>
+      </div>
+
+      <!-- Orange Money -->
+      <div class="pricing-card">
+        <p class="pricing-name">Pro</p>
+        <div class="pricing-price">1 000 <span>FCFA / <span data-i18n="price.month">mo</span></span></div>
+        <p class="pricing-trial" data-i18n="price.trial_om">7-day free trial · Orange Money</p>
+        <ul class="pricing-features" id="omFeatures"></ul>
+        <button class="btn-ghost" style="width:100%;padding:13px" onclick="toggleOMForm()" data-i18n="price.om_btn">Pay via Orange Money</button>
+        <div class="om-form" id="omForm">
+          <div class="om-number" id="omNumber"></div>
+          <div class="form-field">
+            <label class="field-label" data-i18n="om.name">Full name</label>
+            <input class="field-input" id="omName" type="text" placeholder="Jean Dupont">
+          </div>
+          <div class="form-field">
+            <label class="field-label" data-i18n="om.email">Email</label>
+            <input class="field-input" id="omEmail" type="email" placeholder="email@example.com">
+          </div>
+          <div class="form-field">
+            <label class="field-label" data-i18n="om.phone">Your OM number</label>
+            <input class="field-input" id="omPhone" type="tel" placeholder="+237 6XX XXX XXX">
+          </div>
+          <div class="form-field">
+            <label class="field-label" data-i18n="om.txid">Transaction ID</label>
+            <input class="field-input" id="omTxId" type="text" placeholder="Ex: OM2024XXXXXXXXX">
+          </div>
+          <button class="btn-primary" style="width:100%;padding:11px;margin-top:.5rem" onclick="submitOrangeMoney()" data-i18n="om.submit">Confirm my payment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section class="history-section" id="history">
+  <div class="section-inner">
+    <p class="section-label" data-i18n="hist.label">My workflows</p>
+    <h2 class="section-title" data-i18n="hist.title">Your <em>history.</em></h2>
+    <div class="history-grid" id="historyGrid"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Auto<span>Flow</span></div>
+
+  <div class="byline">
+    Crafted with precision by &nbsp;<strong>Wouassi Jude</strong><br>
+    <span style="font-size:11px;letter-spacing:0.18em;font-style:normal;text-transform:uppercase;color:var(--text-3)">CEO · Triple A &nbsp;—&nbsp; AI Automation Agency</span>
+  </div>
+
+  <div class="footer-links">
+    <a href="#" data-i18n="footer.privacy">Privacy</a>
+    <a href="#" data-i18n="footer.terms">Terms</a>
+    <a href="#generator" data-i18n="footer.generate">Generate</a>
+  </div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal" onclick="handleModalClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <h2 class="modal-title" data-i18n="auth.title">Welcome</h2>
+    <p class="modal-sub" data-i18n="auth.sub">Sign in to save your workflows and access your history.</p>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('login')" data-i18n="auth.login">Sign in</button>
+      <button class="modal-tab" onclick="switchTab('signup')" data-i18n="auth.signup">Create account</button>
+    </div>
+    <div id="authForm">
+      <div class="form-field">
+        <label class="field-label" data-i18n="auth.email">Email</label>
+        <input class="field-input" id="authEmail" type="email" placeholder="email@example.com">
+      </div>
+      <div class="form-field">
+        <label class="field-label" data-i18n="auth.password">Password</label>
+        <input class="field-input" id="authPassword" type="password" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" style="width:100%;padding:13px;margin-top:.5rem" onclick="handleAuth()" id="authSubmitBtn" data-i18n="auth.login">Sign in</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"></div>
+
+<script>
+/* ============================================================
+   i18n
+   ============================================================ */
+const i18n = {
+  fr: {
+    "nav.how": "Comment ça marche",
+    "nav.generate": "Générer",
+    "nav.tutorial": "Tutoriel",
+    "nav.pricing": "Tarifs",
+    "nav.login": "Connexion",
+    "hero.eyebrow": "Plateforme d'automatisation IA",
+    "hero.title1": "Décrivez-le.",
+    "hero.title2": "On l'automatise.",
+    "hero.sub": "Générez des workflows n8n prêts pour la production à partir de langage naturel. Sans code. Sans drag & drop. Juste votre idée — déployée en minutes.",
+    "hero.cta1": "Générer un workflow",
+    "hero.cta2": "Voir comment ça marche",
+    "how.label": "Le processus",
+    "how.title": "Trois étapes.\nInfinies automatisations.",
+    "how.s1.title": "Décrivez votre besoin",
+    "how.s1.desc": "Tapez ce que vous souhaitez automatiser en langage naturel — français ou anglais. Aucune compétence technique requise.",
+    "how.s2.title": "L'IA génère le workflow",
+    "how.s2.desc": "Notre architecte IA crée en quelques secondes un workflow n8n complet et prêt à l'emploi. Chaque nœud, chaque connexion.",
+    "how.s3.title": "Importer & lancer",
+    "how.s3.desc": "Téléchargez le fichier, importez-le dans votre n8n, connectez vos apps. Votre agent tourne 24h/24 — en autonomie.",
+    "gen.label": "Le Générateur",
+    "gen.title": "Qu'est-ce que vous voulez\nautomatiser ?",
+    "gen.prompt.label": "Décrivez votre automatisation",
+    "gen.examples.label": "Exemples rapides",
+    "gen.btn": "Générer mon workflow",
+    "gen.result.summary": "Ce que ça fait",
+    "gen.result.placeholder": "Le résumé de votre workflow apparaîtra ici...",
+    "gen.result.apps": "Applications nécessaires",
+    "gen.result.apps_placeholder": "Les apps seront listées ici",
+    "gen.download": "Télécharger workflow.json",
+    "tut.label": "Guide d'import",
+    "tut.title": "Du fichier à\nl'agent actif.",
+    "tut.steps": [
+      { title: "Créez un compte n8n", desc: "Rendez-vous sur n8n.cloud et créez un compte gratuit. Vous aurez 2 500 exécutions/mois gratuitement.", link: "Aller sur n8n.cloud →", href: "https://n8n.cloud" },
+      { title: "Ouvrez votre instance", desc: "Connectez-vous à votre dashboard n8n. Cliquez sur le menu ··· en haut à droite de la liste des workflows." },
+      { title: "Importez le fichier", desc: "Sélectionnez «Import from File» et choisissez le fichier .json téléchargé depuis AutoFlow. Le workflow apparaît instantanément." },
+      { title: "Connectez vos apps", desc: "Pour chaque nœud qui l'exige, cliquez dessus et ajoutez vos credentials (Gmail, Slack, Drive...). Cela prend 2 minutes." },
+      { title: "Activez le workflow", desc: "Cliquez sur le bouton d'activation en haut à droite. Votre agent est maintenant actif et tourne en autonomie 24h/24." }
+    ],
+    "price.label": "Tarifs",
+    "price.title": "Simple.\nSans surprises.",
+    "price.badge": "Le plus populaire",
+    "price.month": "mois",
+    "price.trial": "7 jours gratuits · Carte requise",
+    "price.trial_om": "7 jours gratuits · Orange Money",
+    "price.stripe_btn": "Payer par carte (Stripe)",
+    "price.om_btn": "Payer via Orange Money",
+    "price.features": [
+      "Workflows n8n illimités",
+      "Historique de tous vos workflows",
+      "Support prioritaire",
+      "Mises à jour incluses",
+      "Tutoriel d'import intégré"
+    ],
+    "om.instructions": "Envoyez 1 000 FCFA au numéro Orange Money :",
+    "om.name_recipient": "Nom du bénéficiaire :",
+    "om.name": "Votre nom complet",
+    "om.email": "Votre email",
+    "om.phone": "Votre numéro OM",
+    "om.txid": "ID de transaction",
+    "om.submit": "Confirmer mon paiement",
+    "hist.label": "Mes workflows",
+    "hist.title": "Votre historique.",
+    "hist.empty": "Aucun workflow généré pour l'instant. Créez votre premier ci-dessus.",
+    "auth.title": "Bienvenue",
+    "auth.sub": "Connectez-vous pour sauvegarder vos workflows et accéder à votre historique.",
+    "auth.login": "Connexion",
+    "auth.signup": "Créer un compte",
+    "auth.email": "Email",
+    "auth.password": "Mot de passe",
+    "footer.privacy": "Confidentialité",
+    "footer.terms": "Conditions",
+    "footer.generate": "Générer",
+    "examples": [
+      "Email → Google Drive + Slack",
+      "Formulaire → CRM + email",
+      "RSS → Twitter auto-post",
+      "Webhook → base de données",
+    ]
+  },
+  en: {
+    "nav.how": "How it works",
+    "nav.generate": "Generate",
+    "nav.tutorial": "Tutorial",
+    "nav.pricing": "Pricing",
+    "nav.login": "Sign in",
+    "hero.eyebrow": "AI Automation Platform",
+    "hero.title1": "Describe it.",
+    "hero.title2": "We automate it.",
+    "hero.sub": "Generate production-ready n8n workflows from plain language. No code. No drag and drop. Just your idea — deployed in minutes.",
+    "hero.cta1": "Generate a workflow",
+    "hero.cta2": "See how it works",
+    "how.label": "The process",
+    "how.title": "Three steps.\nInfinite automations.",
+    "how.s1.title": "Describe your need",
+    "how.s1.desc": "Type what you want to automate in plain language — French or English. No technical knowledge required.",
+    "how.s2.title": "AI generates the workflow",
+    "how.s2.desc": "Our AI architect creates a complete, production-ready n8n workflow JSON in seconds. Every node, every connection.",
+    "how.s3.title": "Import & run",
+    "how.s3.desc": "Download the file, import it into your n8n instance, connect your apps. Your agent runs 24/7 — autonomously.",
+    "gen.label": "The Generator",
+    "gen.title": "What do you want\nto automate?",
+    "gen.prompt.label": "Describe your automation",
+    "gen.examples.label": "Quick examples",
+    "gen.btn": "Generate my workflow",
+    "gen.result.summary": "What it does",
+    "gen.result.placeholder": "Your workflow summary will appear here...",
+    "gen.result.apps": "Apps required",
+    "gen.result.apps_placeholder": "Apps will be listed here",
+    "gen.download": "Download workflow.json",
+    "tut.label": "Import guide",
+    "tut.title": "From file to\nrunning agent.",
+    "tut.steps": [
+      { title: "Create an n8n account", desc: "Go to n8n.cloud and create a free account. You'll get 2,500 executions/month for free.", link: "Go to n8n.cloud →", href: "https://n8n.cloud" },
+      { title: "Open your instance", desc: "Log into your n8n dashboard. Click the ··· menu in the top right of the workflow list." },
+      { title: "Import the file", desc: "Select 'Import from File' and choose the .json file downloaded from AutoFlow. The workflow appears instantly." },
+      { title: "Connect your apps", desc: "For each node that requires it, click on it and add your credentials (Gmail, Slack, Drive...). Takes 2 minutes." },
+      { title: "Activate the workflow", desc: "Click the activation toggle in the top right. Your agent is now live and running autonomously 24/7." }
+    ],
+    "price.label": "Pricing",
+    "price.title": "Simple.\nNo surprises.",
+    "price.badge": "Most popular",
+    "price.month": "mo",
+    "price.trial": "7-day free trial · Card required",
+    "price.trial_om": "7-day free trial · Orange Money",
+    "price.stripe_btn": "Pay by card (Stripe)",
+    "price.om_btn": "Pay via Orange Money",
+    "price.features": [
+      "Unlimited n8n workflows",
+      "Full workflow history",
+      "Priority support",
+      "Updates included",
+      "Built-in import tutorial"
+    ],
+    "om.instructions": "Send 1,000 FCFA to Orange Money number:",
+    "om.name_recipient": "Recipient name:",
+    "om.name": "Your full name",
+    "om.email": "Your email",
+    "om.phone": "Your OM number",
+    "om.txid": "Transaction ID",
+    "om.submit": "Confirm my payment",
+    "hist.label": "My workflows",
+    "hist.title": "Your history.",
+    "hist.empty": "No workflows generated yet. Create your first one above.",
+    "auth.title": "Welcome",
+    "auth.sub": "Sign in to save your workflows and access your history.",
+    "auth.login": "Sign in",
+    "auth.signup": "Create account",
+    "auth.email": "Email",
+    "auth.password": "Password",
+    "footer.privacy": "Privacy",
+    "footer.terms": "Terms",
+    "footer.generate": "Generate",
+    "examples": [
+      "Email → Google Drive + Slack",
+      "Form → CRM + email",
+      "RSS → auto Twitter post",
+      "Webhook → database",
+    ]
+  }
+};
+
+let currentLang = 'fr';
+let currentWorkflow = null;
+let currentWorkflowName = '';
+let authMode = 'login';
+let sessionToken = null;
+
+// Simple session token for API auth
+function getSessionToken() {
+  if (!sessionToken) {
+    sessionToken = btoa(Math.random().toString(36) + Date.now());
+    sessionStorage.setItem('af_token', sessionToken);
+  }
+  return sessionToken;
+}
+
+/* ============================================================
+   i18n Engine
+   ============================================================ */
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang.toUpperCase()));
+  applyTranslations();
+  renderDynamicSections();
+}
+
+function t(key) {
+  return i18n[currentLang][key] || i18n['en'][key] || key;
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (val) el.textContent = val;
+  });
+}
+
+function renderDynamicSections() {
+  // Examples
+  const chips = document.getElementById('exampleChips');
+  if (chips) {
+    chips.innerHTML = t('examples').map(ex =>
+      `<button class="example-chip" onclick="useExample(this)">${ex}</button>`
+    ).join('');
+  }
+
+  // Tutorial
+  const tutSteps = document.getElementById('tutorialSteps');
+  if (tutSteps) {
+    const steps = t('tut.steps');
+    tutSteps.innerHTML = steps.map((s, i) => `
+      <div class="tut-step">
+        <div class="tut-left">
+          <div class="tut-num">${i + 1}</div>
+          ${i < steps.length - 1 ? '<div class="tut-line"></div>' : ''}
+        </div>
+        <div class="tut-content">
+          <h3 class="tut-title">${s.title}</h3>
+          <p class="tut-desc">${s.desc}</p>
+          ${s.link ? `<a class="tut-link" href="${s.href}" target="_blank" rel="noopener">${s.link}</a>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Pricing features
+  const feats = t('price.features');
+  ['stripeFeatures','omFeatures'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = feats.map(f => `<li><div class="feat-dot"></div>${f}</li>`).join('');
+  });
+
+  // OM instructions
+  const omNum = document.getElementById('omNumber');
+  if (omNum) {
+    omNum.innerHTML = `${t('om.instructions')} <strong>+237 692 598 988</strong><br>${t('om.name_recipient')} <strong>TIENTCHEU epse WOUASSI</strong>`;
+  }
+
+  // History
+  renderHistory();
+}
+
+/* ============================================================
+   Navbar scroll
+   ============================================================ */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ============================================================
+   Generator
+   ============================================================ */
+function updateCharCount(el) {
+  document.getElementById('charCount').textContent = el.value.length;
+}
+
+function useExample(btn) {
+  document.getElementById('promptInput').value = btn.textContent;
+  document.getElementById('charCount').textContent = btn.textContent.length;
+}
+
+async function generateWorkflow() {
+  const prompt = document.getElementById('promptInput').value.trim();
+  if (!prompt || prompt.length < 10) {
+    showNotif(currentLang === 'fr' ? 'Décrivez votre workflow (min. 10 caractères)' : 'Describe your workflow (min. 10 chars)', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('generateBtn');
+  const progress = document.getElementById('progressBar');
+  const summaryEl = document.getElementById('summaryOutput');
+  const appsEl = document.getElementById('appsOutput');
+  const dlBtn = document.getElementById('downloadBtn');
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+  progress.classList.add('active');
+  summaryEl.classList.remove('has-content');
+  summaryEl.innerHTML = `<span class="output-placeholder" style="font-family:var(--f-display);font-style:italic">${currentLang === 'fr' ? 'Génération en cours...' : 'Generating...'}</span>`;
+  appsEl.innerHTML = '';
+  dlBtn.disabled = true;
+  currentWorkflow = null;
+
+  try {
+    const resp = await fetch('/.netlify/functions/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-session-token': getSessionToken(),
+      },
+      body: JSON.stringify({ prompt, language: currentLang }),
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok) throw new Error(data.error || 'Error');
+
+    currentWorkflow = data.workflow;
+    currentWorkflowName = data.name || 'workflow';
+
+    // Summary
+    summaryEl.classList.add('has-content');
+    summaryEl.textContent = data.summary || '';
+
+    // Apps
+    appsEl.innerHTML = (data.apps || []).map(a => `<div class="app-tag">${a}</div>`).join('') ||
+      `<span style="color:var(--text-3);font-size:13px">${currentLang === 'fr' ? 'Aucune app externe requise' : 'No external app required'}</span>`;
+
+    dlBtn.disabled = false;
+
+    // Save to history
+    saveToHistory({ name: currentWorkflowName, summary: data.summary, workflow: currentWorkflow, apps: data.apps, date: Date.now() });
+    renderHistory();
+
+    showNotif(currentLang === 'fr' ? 'Workflow généré avec succès ✓' : 'Workflow generated ✓', 'success');
+  } catch (err) {
+    summaryEl.innerHTML = `<span style="color:var(--red);font-size:13px">${currentLang === 'fr' ? 'Erreur : ' : 'Error: '}${err.message}</span>`;
+    showNotif(currentLang === 'fr' ? 'Erreur lors de la génération' : 'Generation failed', 'error');
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    progress.classList.remove('active');
+  }
+}
+
+function downloadWorkflow(workflow, name) {
+  const wf = workflow || currentWorkflow;
+  const nm = name || currentWorkflowName || 'workflow';
+  if (!wf) return;
+  const blob = new Blob([JSON.stringify(wf, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${nm.replace(/\s+/g, '_').toLowerCase()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ============================================================
+   History (localStorage)
+   ============================================================ */
+function saveToHistory(item) {
+  try {
+    const hist = getHistory();
+    hist.unshift(item);
+    localStorage.setItem('af_history', JSON.stringify(hist.slice(0, 20)));
+  } catch(e) {}
+}
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('af_history') || '[]'); } catch { return []; }
+}
+
+function renderHistory() {
+  const grid = document.getElementById('historyGrid');
+  if (!grid) return;
+  const hist = getHistory();
+  if (!hist.length) {
+    grid.innerHTML = `<p class="history-empty">${t('hist.empty')}</p>`;
+    return;
+  }
+  grid.innerHTML = hist.map((item, i) => `
+    <div class="history-card">
+      <div class="history-name">${item.name || 'Workflow'}</div>
+      <div class="history-desc">${item.summary || ''}</div>
+      <div class="history-meta">
+        <span>${new Date(item.date).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US')}</span>
+        <button class="history-dl" onclick="downloadWorkflow(${i === 0 ? 'null' : `getHistory()[${i}].workflow`}, '${(item.name || 'workflow').replace(/'/g,"\\'")}')">
+          ${currentLang === 'fr' ? 'Télécharger' : 'Download'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   Pricing
+   ============================================================ */
+function toggleOMForm() {
+  document.getElementById('omForm').classList.toggle('visible');
+}
+
+async function handleStripeCheckout() {
+  const email = prompt(currentLang === 'fr' ? 'Votre adresse email :' : 'Your email address:');
+  if (!email) return;
+  try {
+    const resp = await fetch('/.netlify/functions/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, language: currentLang }),
+    });
+    const data = await resp.json();
+    if (data.url) window.location.href = data.url;
+    else throw new Error(data.error);
+  } catch(e) {
+    showNotif(currentLang === 'fr' ? 'Erreur paiement : ' + e.message : 'Payment error: ' + e.message, 'error');
+  }
+}
+
+async function submitOrangeMoney() {
+  const name = document.getElementById('omName').value.trim();
+  const email = document.getElementById('omEmail').value.trim();
+  const phone = document.getElementById('omPhone').value.trim();
+  const txId = document.getElementById('omTxId').value.trim();
+
+  if (!name || !email || !phone || !txId) {
+    showNotif(currentLang === 'fr' ? 'Tous les champs sont requis' : 'All fields required', 'error');
+    return;
+  }
+
+  try {
+    const resp = await fetch('/.netlify/functions/orange-money', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, transactionId: txId }),
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      showNotif(currentLang === 'fr' ? `Demande reçue — Réf: ${data.reference}. Activation sous 2h.` : `Request received — Ref: ${data.reference}. Activation within 2h.`, 'success');
+      document.getElementById('omForm').classList.remove('visible');
+    } else throw new Error(data.error);
+  } catch(e) {
+    showNotif(currentLang === 'fr' ? 'Erreur : ' + e.message : 'Error: ' + e.message, 'error');
+  }
+}
+
+/* ============================================================
+   Auth Modal
+   ============================================================ */
+function openAuth() {
+  document.getElementById('authModal').classList.add('open');
+}
+
+function closeAuth() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function handleModalClick(e) {
+  if (e.target === document.getElementById('authModal')) closeAuth();
+}
+
+function switchTab(mode) {
+  authMode = mode;
+  document.querySelectorAll('.modal-tab').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && mode === 'login') || (i === 1 && mode === 'signup'));
+  });
+  document.getElementById('authSubmitBtn').textContent = mode === 'login' ? t('auth.login') : t('auth.signup');
+}
+
+function handleAuth() {
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+  if (!email || !password) {
+    showNotif(currentLang === 'fr' ? 'Email et mot de passe requis' : 'Email and password required', 'error');
+    return;
+  }
+  // TODO: Connect to Supabase auth
+  showNotif(currentLang === 'fr' ? 'Fonctionnalité bientôt disponible — connectez Supabase' : 'Feature coming soon — connect Supabase', 'error');
+}
+
+/* ============================================================
+   Notification
+   ============================================================ */
+function showNotif(msg, type = '') {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = `notif show ${type}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = 'notif', 3200);
+}
+
+/* ============================================================
+   Init
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  getSessionToken();
+  applyTranslations();
+  renderDynamicSections();
+});
+</script>
+</body>
+</html>
